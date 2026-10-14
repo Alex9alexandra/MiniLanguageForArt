@@ -1,0 +1,26 @@
+* c1
+* c2
+[5] canvas1
+IF - EMPTY canvas1 -
+>
+	PASTE canvas1 ["red", "blue"]
+<
+GIVE_TO c1
+GIVE_TO c2
+VIEW c1
+VIEW c2
+IF - EMPTY canvas1 -
+>
+	PAINT canvas1 c1
+	IF - EMPTY canvas1 -
+	>
+		PAINT canvas1 c2
+		IF - EMPTY canvas1 -
+		>
+			MIX c1 c2
+			PAINT canvas1 c1
+		<
+	<
+<
+VIEW c1
+VIEW canvas1

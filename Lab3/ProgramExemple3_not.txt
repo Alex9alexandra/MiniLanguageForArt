@@ -1,0 +1,30 @@
+* c1
+* c2
+LOaD c1 "red"
+LOAD c2 "blue"
+[0] mycanvas
+@PAINTING_WHILE - empty mycanvas -
+>
+	IIF - IN c1 "viollet" -
+	>
+		LOAD c1 "yelow"
+	<
+	IF - IN c1 "green" -
+	>
+		LOAD c1 "blue"
+		LOAD c2 "orange"
+	<
+	IF IN c1 "brown" -
+	>
+		LOAD C1 "orange"
+	<
+	PAINT mycanvas c1
+	MIX 1c c2
+	IF - EMPTY mycanvas -
+	>
+		PANT mycanvas c1
+	<
+<
+VIEW c1
+VIEW c2
+VIEW mycanvas

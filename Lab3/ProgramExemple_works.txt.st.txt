@@ -1,0 +1,7 @@
+Symbol               Position
+"blue"               5
+"red"                4
+5                    2
+c1                   0
+c2                   1
+canvas1              3

@@ -1,0 +1,12 @@
+Symbol               Position
+"blue"               3
+"brown"              10
+"green"              8
+"orange"             9
+"red"                2
+"violet"             6
+"yellow"             7
+7                    4
+c1                   0
+c2                   1
+mycanvas             5

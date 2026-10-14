@@ -1,0 +1,10 @@
+Lexical error at line 3: invalid identifier or unknown keyword: 'LOaD'
+Lexical error at line 5: number cannot start with 0 (a canvas size must be 1 or more): '0'
+Lexical error at line 6: unexpected character: '@'
+Lexical error at line 8: invalid identifier or unknown keyword: 'IIF'
+Lexical error at line 8: invalid color constant: '"viollet"'
+Lexical error at line 10: invalid color constant: '"yelow"'
+Lexical error at line 19: invalid identifier or unknown keyword: 'C1'
+Lexical error at line 22: identifier cannot start with a digit: '1c'
+Lexical error at line 25: invalid identifier or unknown keyword: 'PANT'
+9 lexical error(s) found.
