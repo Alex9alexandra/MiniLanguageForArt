@@ -1,0 +1,6 @@
+N     = {START, ID}
+Sigma = {a-z, 0-9}
+S     = START
+P:
+  START -> a-z ID | a-z
+  ID    -> a-z ID | a-z | 0-9 ID | 0-9

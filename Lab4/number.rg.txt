@@ -1,0 +1,6 @@
+N     = {START, NUM}
+Sigma = {0-9}
+S     = START
+P:
+  START -> 1-9 NUM | 1-9
+  NUM   -> 0-9 NUM | 0-9

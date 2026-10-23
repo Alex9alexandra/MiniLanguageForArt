@@ -1,0 +1,143 @@
+LAB 4 
+Mini-language for painting
+git: ? 
+
+
+1. DEFINITIONS
+
+Finite Automaton(FA)=(Q, Sigma, delta, q0, F)
+Q: set of states
+Sigma: alphabet
+delta: transitions: delta(state, character)= next state
+q0: start state
+F: set of final states
+A word is accepted if, after reading all its characters, the FA is in a final state.A missing transition means the word is rejected.
+
+Regular Grammar(RG) =(N, Sigma, S, P)
+N: non-terminals
+Sigma: terminals
+S: start symbol
+P: productions of the form  A -> a B  or  A -> a
+
+The FAs and the grammars below describe the identifiers and the constants of the mini art language
+
+
+2. THE FILE FORMAT
+
+states: <state names>
+alphabet: <characters or ranges>
+start: <start state>
+final: <final states>
+transitions: <state> <character or range> <next state>
+
+A range such as a-z means every letter from a to z. The lines starting with # are comments and are ignored. Files: identifier.fa.txt, number.fa.txt, color.fa.txt.
+
+3. THE THREE FAs
+
+In the tables, -> marks the start state and * marks a final state.
+
+Identifiers: a lowercase letter, then lowercase letters or digits
+
+---------------------------
+| state     | a-z  | 0-9  |
+---------------------------
+| -> START  | ID   |  -   |
+---------------------------
+| * ID      | ID   | ID   |
+---------------------------
+
+Accepted: c1, mycanvas        
+Rejected: 1c, Abc
+
+Numbers: a non-zero digit, then any digits
+
+---------------------------
+| state     | 1-9  | 0    |
+---------------------------
+| -> START  | NUM  |  -   |
+---------------------------
+| * NUM     | NUM  | NUM  |
+---------------------------
+
+Accepted: 7, 205             
+Rejected: 05
+
+Colors: a quote, one of seven names, a quote
+
+The FA is a tree of letters. START reads the opening quote and goes to OPEN. From OPEN, one path of states spells each name (the names "blue" and "brown" share the first letter b). The last letter of every name leads to a state that reads the closing quote and goes to the final state END.
+
+----------------------------------------------
+| state     | "     | letter read             |
+----------------------------------------------
+| -> START  | OPEN  | -                       |
+----------------------------------------------
+| OPEN      | -     | r->R b->B y->Y g->G     |
+|           |       | v->V o->O               |
+----------------------------------------------
+| R, RE     | -     | e->RE, d->RED           |
+----------------------------------------------
+| RED       | END   | -                       |
+ ----------------------------------------------
+| * END     | -     | -                       |
+----------------------------------------------
+The other six names follow the same pattern
+
+Accepted: "red", "brown"     
+Rejected: "purple" , red
+
+4. TRANSFORMATION FA -> RG
+
+Rule1:Every state becomes a non-terminal. The start state becomes the start symbol.
+Rule2:Every transition  A --a--> B  becomes the production  A -> a B
+Rule3 :If B is a final state, the production  A -> a  is also added.
+Rule4: If the start state is final (the FA accepts the empty word), a new start symbol S' is added with S' -> (rules of S) | epsilon
+
+Example (numbers):
+------------------------------------------------
+| transition        | production(s)            |
+------------------------------------------------
+| START --1-9--> NUM | START -> 1-9 NUM         |
+|  (NUM is final)    | START -> 1-9             |
+------------------------------------------------
+| NUM --0-9--> NUM   | NUM -> 0-9 NUM          |
+|  (NUM is final)    | NUM -> 0-9              |
+------------------------------------------------
+
+5. THE RESULTING GRAMMARS
+
+Identifiers
+N = {START, ID}    Sigma = {a-z, 0-9}    S = START
+START -> a-z ID | a-z
+ID    -> a-z ID | a-z | 0-9 ID | 0-9
+
+Numbers
+N = {START, NUM}   Sigma = {0-9}         S = START
+START -> 1-9 NUM | 1-9
+NUM   -> 0-9 NUM | 0-9
+
+Colors (first rules; the rest follow the same pattern, see color.rg.txt)
+S = START
+START -> " OPEN
+OPEN  -> r R | b B | y Y | g G | v V | o O
+R     -> e RE
+RE    -> d RED
+RED   -> " END | "
+B     -> l BL | r BR
+...
+
+Derivations
+205     START => 2 NUM => 20 NUM => 205
+"red"   START => " OPEN => "r R => "re RE => "red RED => "red"
+
+
+6. THE PROGRAM (fa_to_rg.py)
+
+Language: Python
+ The program reads all FA files or a given FA, checks that it is well-defined (known states, symbols in the alphabet, deterministic), applies the four rules and prints the grammar. It also writes it to a file rg.txt.
+
+Main functions:
+expand: turns a range like a-z into the list of its characters
+read_fa: reads the FA file
+check_fa: rejects an incorrect FA, with the line number
+fa_to_rg: applies rules 1 to 4
+format_rg: prints the grammar

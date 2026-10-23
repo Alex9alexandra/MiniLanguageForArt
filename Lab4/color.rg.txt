@@ -1,0 +1,40 @@
+N     = {START, OPEN, R, RE, RED, B, BL, BLU, BLUE, Y, YE, YEL, YELL, YELLO, YELLOW, G, GR, GRE, GREE, GREEN, V, VI, VIO, VIOL, VIOLE, VIOLET, O, OR, ORA, ORAN, ORANG, ORANGE, BR, BRO, BROW, BROWN, END}
+Sigma = {", a, b, d, e, g, i, l, n, o, r, t, u, v, w, y}
+S     = START
+P:
+  START  -> " OPEN
+  OPEN   -> r R | b B | y Y | g G | v V | o O
+  R      -> e RE
+  RE     -> d RED
+  RED    -> " END | "
+  B      -> l BL | r BR
+  BL     -> u BLU
+  BLU    -> e BLUE
+  BLUE   -> " END | "
+  Y      -> e YE
+  YE     -> l YEL
+  YEL    -> l YELL
+  YELL   -> o YELLO
+  YELLO  -> w YELLOW
+  YELLOW -> " END | "
+  G      -> r GR
+  GR     -> e GRE
+  GRE    -> e GREE
+  GREE   -> n GREEN
+  GREEN  -> " END | "
+  V      -> i VI
+  VI     -> o VIO
+  VIO    -> l VIOL
+  VIOL   -> e VIOLE
+  VIOLE  -> t VIOLET
+  VIOLET -> " END | "
+  O      -> r OR
+  OR     -> a ORA
+  ORA    -> n ORAN
+  ORAN   -> g ORANG
+  ORANG  -> e ORANGE
+  ORANGE -> " END | "
+  BR     -> o BRO
+  BRO    -> w BROW
+  BROW   -> n BROWN
+  BROWN  -> " END | "
