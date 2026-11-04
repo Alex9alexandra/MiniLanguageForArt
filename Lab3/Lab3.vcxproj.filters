@@ -21,9 +21,15 @@
     <ClCompile Include="lex.yy.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="fa.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="symbolTable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fa.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -34,5 +40,8 @@
     <Text Include="ProgramExemple_works.txt" />
     <Text Include="ProgramExemple2_works.txt" />
     <Text Include="ProgramExemple3_not.txt" />
+    <Text Include="identifier.fa.txt" />
+    <Text Include="number.fa.txt" />
+    <Text Include="color.fa.txt" />
   </ItemGroup>
 </Project>

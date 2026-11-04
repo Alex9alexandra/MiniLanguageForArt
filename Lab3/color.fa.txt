@@ -1,0 +1,48 @@
+# FA for color constants: "red" "blue" "yellow" "green" "violet" "orange" "brown"
+states: START OPEN R RE RED B BL BLU BLUE Y YE YEL YELL YELLO YELLOW G GR GRE GREE GREEN V VI VIO VIOL VIOLE VIOLET O OR ORA ORAN ORANG ORANGE BR BRO BROW BROWN END
+alphabet: " a b d e g i l n o r t u v w y
+start: START
+final: END
+transitions:
+START " OPEN
+OPEN r R
+R e RE
+RE d RED
+RED " END
+OPEN b B
+B l BL
+BL u BLU
+BLU e BLUE
+BLUE " END
+OPEN y Y
+Y e YE
+YE l YEL
+YEL l YELL
+YELL o YELLO
+YELLO w YELLOW
+YELLOW " END
+OPEN g G
+G r GR
+GR e GRE
+GRE e GREE
+GREE n GREEN
+GREEN " END
+OPEN v V
+V i VI
+VI o VIO
+VIO l VIOL
+VIOL e VIOLE
+VIOLE t VIOLET
+VIOLET " END
+OPEN o O
+O r OR
+OR a ORA
+ORA n ORAN
+ORAN g ORANG
+ORANG e ORANGE
+ORANGE " END
+B r BR
+BR o BRO
+BRO w BROW
+BROW n BROWN
+BROWN " END

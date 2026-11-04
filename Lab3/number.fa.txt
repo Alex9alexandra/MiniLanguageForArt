@@ -1,0 +1,8 @@
+# FA for numbers: a non-zero digit followed by any digits
+states: START NUM
+alphabet: 0-9
+start: START
+final: NUM
+transitions:
+START 1-9 NUM
+NUM 0-9 NUM

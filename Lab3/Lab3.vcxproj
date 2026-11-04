@@ -123,16 +123,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="fa.c" />
     <ClCompile Include="lex.yy.c" />
     <ClCompile Include="symbolTable.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="fa.h" />
     <ClInclude Include="symbolTable.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="scanner.l" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="color.fa.txt" />
+    <Text Include="identifier.fa.txt" />
+    <Text Include="number.fa.txt" />
     <Text Include="ProgramExemple2_works.txt" />
     <Text Include="ProgramExemple3_not.txt" />
     <Text Include="ProgramExemple_works.txt" />
