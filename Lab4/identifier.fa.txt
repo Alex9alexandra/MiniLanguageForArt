@@ -1,0 +1,9 @@
+# FA for identifiers: a lowercase letter followed by lowercase letters or digits
+states: START ID
+alphabet: a-z 0-9
+start: START
+final: ID
+transitions:
+START a-z ID
+ID a-z ID
+ID 0-9 ID
