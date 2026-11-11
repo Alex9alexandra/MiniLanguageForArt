@@ -1,0 +1,95 @@
+color_identifier -> ID
+color_definition -> STAR color_identifier
+definition -> color_definition
+statement -> definition
+statement_list -> statement
+color_identifier -> ID
+color_definition -> STAR color_identifier
+definition -> color_definition
+statement -> definition
+statement_list -> statement_list statement
+canvas_identifier -> ID
+canvas_definition -> LBRACKET NUMBER RBRACKET canvas_identifier
+definition -> canvas_definition
+statement -> definition
+statement_list -> statement_list statement
+canvas_identifier -> ID
+content_check_canvas_expression -> EMPTY canvas_identifier
+expression -> content_check_canvas_expression
+canvas_identifier -> ID
+color_list -> COLOR
+color_list -> color_list COMMA COLOR
+canvas -> LBRACKET color_list RBRACKET
+canvas_assignment_statement_full -> PASTE canvas_identifier canvas
+statement -> canvas_assignment_statement_full
+statement_list -> statement
+block -> statement_list
+conditional_statement -> IF MINUS expression MINUS GT block LT
+statement -> conditional_statement
+statement_list -> statement_list statement
+identifier -> ID
+input -> GIVE_TO identifier
+statement -> input
+statement_list -> statement_list statement
+identifier -> ID
+input -> GIVE_TO identifier
+statement -> input
+statement_list -> statement_list statement
+identifier -> ID
+output -> VIEW identifier
+statement -> output
+statement_list -> statement_list statement
+identifier -> ID
+output -> VIEW identifier
+statement -> output
+statement_list -> statement_list statement
+canvas_identifier -> ID
+content_check_canvas_expression -> EMPTY canvas_identifier
+expression -> content_check_canvas_expression
+canvas_identifier -> ID
+color_identifier -> ID
+canvas_assignment_statement -> PAINT canvas_identifier color_identifier
+statement -> canvas_assignment_statement
+statement_list -> statement
+canvas_identifier -> ID
+content_check_canvas_expression -> EMPTY canvas_identifier
+expression -> content_check_canvas_expression
+canvas_identifier -> ID
+color_identifier -> ID
+canvas_assignment_statement -> PAINT canvas_identifier color_identifier
+statement -> canvas_assignment_statement
+statement_list -> statement
+canvas_identifier -> ID
+content_check_canvas_expression -> EMPTY canvas_identifier
+expression -> content_check_canvas_expression
+color_identifier -> ID
+color_identifier -> ID
+operation -> MIX color_identifier color_identifier
+statement -> operation
+statement_list -> statement
+canvas_identifier -> ID
+color_identifier -> ID
+canvas_assignment_statement -> PAINT canvas_identifier color_identifier
+statement -> canvas_assignment_statement
+statement_list -> statement_list statement
+block -> statement_list
+conditional_statement -> IF MINUS expression MINUS GT block LT
+statement -> conditional_statement
+statement_list -> statement_list statement
+block -> statement_list
+conditional_statement -> IF MINUS expression MINUS GT block LT
+statement -> conditional_statement
+statement_list -> statement_list statement
+block -> statement_list
+conditional_statement -> IF MINUS expression MINUS GT block LT
+statement -> conditional_statement
+statement_list -> statement_list statement
+identifier -> ID
+output -> VIEW identifier
+statement -> output
+statement_list -> statement_list statement
+identifier -> ID
+output -> VIEW identifier
+statement -> output
+statement_list -> statement_list statement
+program -> statement_list

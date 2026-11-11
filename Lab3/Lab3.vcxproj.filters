@@ -24,6 +24,9 @@
     <ClCompile Include="fa.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="parser.tab.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="symbolTable.h">
@@ -32,9 +35,13 @@
     <ClInclude Include="fa.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="parser.tab.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="scanner.l" />
+    <None Include="parser.y" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ProgramExemple_works.txt" />
@@ -43,5 +50,7 @@
     <Text Include="identifier.fa.txt" />
     <Text Include="number.fa.txt" />
     <Text Include="color.fa.txt" />
+    <Text Include="MiniArtLanguageGrammar.txt" />
+    <Text Include="ProgramExemple4_not.txt" />
   </ItemGroup>
 </Project>

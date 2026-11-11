@@ -1,1 +1,1 @@
-No lexical errors.
+No lexical or syntax errors.

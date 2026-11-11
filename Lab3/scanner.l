@@ -6,6 +6,7 @@
 #include <ctype.h>
 #include "symbolTable.h"
 #include "fa.h"
+#include "parser.tab.h" /* token names of the parser: IF, ID, COLOR ... (made by bison) */
 
 /* The three automata, loaded from files when the program starts */
 #define IDENTIFIER_FA_FILE "identifier.fa.txt"
@@ -36,12 +37,13 @@
 
 static SymbolTable st;
 static FILE *pifFile;
-static FILE *errFile;
-static int line = 1;
-static int errorCount = 0;
+FILE *errFile;/* used by the parser too (parser.y) */
+FILE *prodFile; /* the string of productions, written by the parser */
+int line = 1; /* used by the parser for the error messages */
+int errorCount = 0;
 static FA identifierFA, numberFA, colorFA;
 
-static void scan_with_fa(const FA *fa, int tokenCode);
+static int scan_with_fa(const FA *fa, int pifCode, int parserToken);
 
 /* Writes one pair (code, ST position) to the PIF, followed by the token text. */
 static void emit_text(int code, int position, const char *text) {
@@ -60,38 +62,39 @@ static void report(const char *message) { report_text(message, yytext); }
 
 %%
 
-"IF"               { emit(T_IF, -1); }
-"IN"               { emit(T_IN, -1); }
-"LOAD"             { emit(T_LOAD, -1); }
-"PAINTING_WHILE"   { emit(T_PAINTING_WHILE, -1); }
-"EMPTY"            { emit(T_EMPTY, -1); }
-"PAINT"            { emit(T_PAINT, -1); }
-"PASTE"            { emit(T_PASTE, -1); }
-"GIVE_TO"          { emit(T_GIVE_TO, -1); }
-"VIEW"             { emit(T_VIEW, -1); }
-"MIX"              { emit(T_MIX, -1); }
+"IF"               { emit(T_IF, -1); return IF; }
+"IN"               { emit(T_IN, -1); return IN; }
+"LOAD"             { emit(T_LOAD, -1); return LOAD; }
+"PAINTING_WHILE"   { emit(T_PAINTING_WHILE, -1); return PAINTING_WHILE; }
+"EMPTY"            { emit(T_EMPTY, -1); return EMPTY; }
+"PAINT"            { emit(T_PAINT, -1); return PAINT; }
+"PASTE"            { emit(T_PASTE, -1); return PASTE; }
+"GIVE_TO"          { emit(T_GIVE_TO, -1); return GIVE_TO; }
+"VIEW"             { emit(T_VIEW, -1); return VIEW; }
+"MIX"              { emit(T_MIX, -1); return MIX; }
 
-"-"                { emit(T_MINUS, -1); }
-">"                { emit(T_GREATER, -1); }
-"<"                { emit(T_LESS, -1); }
-"*"                { emit(T_STAR, -1); }
-"["                { emit(T_LBRACKET, -1); }
-"]"                { emit(T_RBRACKET, -1); }
-","                { emit(T_COMMA, -1); }
+"-"                { emit(T_MINUS, -1); return MINUS; }
+">"                { emit(T_GREATER, -1); return GT; }
+"<"                { emit(T_LESS, -1); return LT; }
+"*"                { emit(T_STAR, -1); return STAR; }
+"["                { emit(T_LBRACKET, -1); return LBRACKET; }
+"]"                { emit(T_RBRACKET, -1); return RBRACKET; }
+","                { emit(T_COMMA, -1); return COMMA; }
 
     /* Identifiers and constants are recognized by the finite automata.
-       flex only detects the first character; scan_with_fa runs the FA from there. */
-[a-z]              { scan_with_fa(&identifierFA, T_IDENTIFIER); }
-[1-9]              { scan_with_fa(&numberFA, T_CONSTANT); }
-\"                 { scan_with_fa(&colorFA, T_CONSTANT); }
+       flex only detects the first character; scan_with_fa runs the FA from there
+       and returns the token for the parser (ID, NUMBER or COLOR). */
+[a-z]              { return scan_with_fa(&identifierFA, T_IDENTIFIER, ID); }
+[1-9]              { return scan_with_fa(&numberFA, T_CONSTANT, NUMBER); }
+\"                 { return scan_with_fa(&colorFA, T_CONSTANT, COLOR); }
 
-0[0-9]*                          { report("number cannot start with 0 (a canvas size must be 1 or more)"); }
-0[0-9]*[a-zA-Z_][a-zA-Z0-9_]*    { report("identifier cannot start with a digit"); }
-[A-Z_][a-zA-Z0-9_]*              { report("invalid identifier or unknown keyword"); }
+0[0-9]*                          { report("number cannot start with 0 (a canvas size must be 1 or more)"); return LEXERROR; }
+0[0-9]*[a-zA-Z_][a-zA-Z0-9_]*    { report("identifier cannot start with a digit"); return LEXERROR; }
+[A-Z_][a-zA-Z0-9_]*              { report("invalid identifier or unknown keyword"); return LEXERROR; }
 
 [ \t\r]+           { /* whitespace is ignored */ }
 \n                 { line++; }
-.                  { report("unexpected character"); }
+.                  { report("unexpected character"); return LEXERROR; }
 
 %%
 
@@ -116,11 +119,12 @@ static const char *describe_error(const char *text, int tooLong) {
     return "invalid identifier or unknown keyword";
 }
 
-/* Runs the automaton on the input, starting with the character flex already read
+/* Returns the token for the parser, or LEXERROR if the word is invalid.
+   Runs the automaton on the input, starting with the character flex already read
    (yytext[0]). It follows the transitions as long as there are any (input() reads the
    next character, unput() gives one back). The word is valid if the FA stops in a final
    state and the next character cannot continue the word. */
-static void scan_with_fa(const FA *fa, int tokenCode) {
+static int scan_with_fa(const FA *fa, int pifCode, int parserToken) {
     char text[MAX_TOKEN + 1];
     int len = 0, tooLong = 0;
     int state = fa->start;
@@ -145,8 +149,8 @@ static void scan_with_fa(const FA *fa, int tokenCode) {
     if (fa_is_final(fa, state) && !tooLong && !(pending != EOF && is_word_char(pending))) {
         text[len] = '\0';
         if (pending != EOF) unput(pending);
-        emit_text(tokenCode, st_insert(&st, text), text);
-        return;
+        emit_text(pifCode, st_insert(&st, text), text);
+        return parserToken;
     }
 
     /* Invalid word: read the rest of it, so that it is reported only once. */
@@ -158,16 +162,19 @@ static void scan_with_fa(const FA *fa, int tokenCode) {
     if (c != EOF && c != 0) unput(c);
     text[len] = '\0';
     report_text(describe_error(text, tooLong), text);
+    return LEXERROR;
 }
 
 int main(int argc, char *argv[]) {
     const char *source = (argc > 1) ? argv[1] : "ProgramExemple_works.txt";
-    char pifName[300], stName[300], errName[300];
+    char pifName[300], stName[300], errName[300], prodName[300];
     FILE *stFile;
+    int result;
 
     snprintf(pifName, sizeof(pifName), "%s.pif.txt", source);
     snprintf(stName, sizeof(stName), "%s.st.txt", source);
     snprintf(errName, sizeof(errName), "%s.err.txt", source);
+    snprintf(prodName, sizeof(prodName), "%s.prod.txt", source);
 
     /* load the three automata (files from Lab 4) */
     if (!fa_load(&identifierFA, IDENTIFIER_FA_FILE) ||
@@ -184,29 +191,30 @@ int main(int argc, char *argv[]) {
     pifFile = fopen(pifName, "w");
     stFile = fopen(stName, "w");
     errFile = fopen(errName, "w");
-    if (pifFile == NULL || stFile == NULL || errFile == NULL) {
+    prodFile = fopen(prodName, "w");
+    if (pifFile == NULL || stFile == NULL || errFile == NULL || prodFile == NULL) {
         printf("Cannot create the output files\n");
         return 1;
     }
 
     st_init(&st);
     fprintf(pifFile, "(code, ST position)\ttoken\n");
-    yylex();
+    result = yyparse();/* the parser asks the scanner (yylex) for tokens */
 
     st_print(&st, stFile);
 
-    if (errorCount == 0) {
-        printf("%s is lexically correct.\n", source);
-        fprintf(errFile, "No lexical errors.\n");
+    if (result == 0) {
+        printf("%s was parsed successfully.\n", source);
+        fprintf(errFile, "No lexical or syntax errors.\n");
     } else {
-        printf("%d lexical error(s) found in %s.\n", errorCount, source);
-        fprintf(errFile, "%d lexical error(s) found.\n", errorCount);
+        printf("Parsing of %s stopped at the first error.\n", source);
     }
 
     fclose(yyin);
     fclose(pifFile);
     fclose(stFile);
     fclose(errFile);
+    fclose(prodFile);
     st_free(&st);
     return 0;
 }

@@ -1,0 +1,43 @@
+Tokens (returned by the scanner)
+  IF  IN  LOAD  PAINTING_WHILE  EMPTY  PAINT  PASTE  GIVE_TO  VIEW  MIX   keywords
+  MINUS  GT  LT  STAR  LBRACKET  RBRACKET  COMMA     symbols  -  >  <  *  [  ]  ,
+  ID        identifier        (identifier FA)
+  NUMBER    number constant   (number FA)
+  COLOR     color constant    (color FA), for example "red"
+
+Start symbol: program
+
+<program>                          ::= <statement_list>
+<statement_list>                   ::= <statement>
+                                     | <statement_list> <statement>
+<statement>                        ::= <loop_statement>
+                                     | <conditional_statement>
+                                     | <color_assignment_statement>
+                                     | <canvas_assignment_statement>
+                                     | <canvas_assignment_statement_full>
+                                     | <input>
+                                     | <output>
+                                     | <definition>
+                                     | <operation>
+<conditional_statement>            ::= IF MINUS <expression> MINUS GT <block> LT
+<loop_statement>                   ::= PAINTING_WHILE MINUS <expression> MINUS GT <block> LT
+<expression>                       ::= <content_check_color_expression>
+                                     | <content_check_canvas_expression>
+<content_check_color_expression>   ::= IN <color_identifier> COLOR
+<content_check_canvas_expression>  ::= EMPTY <canvas_identifier>
+<block>                            ::= <statement_list>
+<color_assignment_statement>       ::= LOAD <color_identifier> COLOR
+<canvas_assignment_statement>      ::= PAINT <canvas_identifier> <color_identifier>
+<canvas_assignment_statement_full> ::= PASTE <canvas_identifier> <canvas>
+<input>                            ::= GIVE_TO <identifier>
+<output>                           ::= VIEW <identifier>
+<definition>                       ::= <color_definition> | <canvas_definition>
+<color_definition>                 ::= STAR <color_identifier>
+<canvas_definition>                ::= LBRACKET NUMBER RBRACKET <canvas_identifier>
+<operation>                        ::= MIX <color_identifier> <color_identifier>
+<canvas>                           ::= LBRACKET <color_list> RBRACKET
+<color_list>                       ::= COLOR
+                                     | <color_list> COMMA COLOR
+<identifier>                       ::= ID
+<canvas_identifier>                ::= ID
+<color_identifier>                 ::= ID

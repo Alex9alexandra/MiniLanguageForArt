@@ -1,0 +1,5 @@
+color_identifier -> ID
+color_definition -> STAR color_identifier
+definition -> color_definition
+statement -> definition
+statement_list -> statement

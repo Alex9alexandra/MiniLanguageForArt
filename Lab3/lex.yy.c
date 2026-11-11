@@ -493,6 +493,7 @@ char *yytext;
 #include <ctype.h>
 #include "symbolTable.h"
 #include "fa.h"
+#include "parser.tab.h"      /* token names of the parser: IF, ID, COLOR ... (made by bison) */
 
 /* The three automata, loaded from files when the program starts */
 #define IDENTIFIER_FA_FILE "identifier.fa.txt"
@@ -523,12 +524,13 @@ char *yytext;
 
 static SymbolTable st;
 static FILE *pifFile;
-static FILE *errFile;
-static int line = 1;
-static int errorCount = 0;
+FILE *errFile;             /* used by the parser too (parser.y) */
+FILE *prodFile;            /* the string of productions, written by the parser */
+int line = 1;               /* used by the parser for the error messages */
+int errorCount = 0;
 static FA identifierFA, numberFA, colorFA;
 
-static void scan_with_fa(const FA *fa, int tokenCode);
+static int scan_with_fa(const FA *fa, int pifCode, int parserToken);
 
 /* Writes one pair (code, ST position) to the PIF, followed by the token text. */
 static void emit_text(int code, int position, const char *text) {
@@ -543,8 +545,8 @@ static void report_text(const char *message, const char *text) {
     fprintf(errFile, "Lexical error at line %d: %s: '%s'\n", line, message, text);
 }
 static void report(const char *message) { report_text(message, yytext); }
-#line 546 "lex.yy.c"
-#line 547 "lex.yy.c"
+#line 548 "lex.yy.c"
+#line 549 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -758,10 +760,10 @@ YY_DECL
 		}
 
 	{
-#line 61 "scanner.l"
+#line 63 "scanner.l"
 
 
-#line 764 "lex.yy.c"
+#line 766 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -820,143 +822,144 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 63 "scanner.l"
-{ emit(T_IF, -1); }
+#line 65 "scanner.l"
+{ emit(T_IF, -1); return IF; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 64 "scanner.l"
-{ emit(T_IN, -1); }
+#line 66 "scanner.l"
+{ emit(T_IN, -1); return IN; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 65 "scanner.l"
-{ emit(T_LOAD, -1); }
+#line 67 "scanner.l"
+{ emit(T_LOAD, -1); return LOAD; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 66 "scanner.l"
-{ emit(T_PAINTING_WHILE, -1); }
+#line 68 "scanner.l"
+{ emit(T_PAINTING_WHILE, -1); return PAINTING_WHILE; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 67 "scanner.l"
-{ emit(T_EMPTY, -1); }
+#line 69 "scanner.l"
+{ emit(T_EMPTY, -1); return EMPTY; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 68 "scanner.l"
-{ emit(T_PAINT, -1); }
+#line 70 "scanner.l"
+{ emit(T_PAINT, -1); return PAINT; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 69 "scanner.l"
-{ emit(T_PASTE, -1); }
+#line 71 "scanner.l"
+{ emit(T_PASTE, -1); return PASTE; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 70 "scanner.l"
-{ emit(T_GIVE_TO, -1); }
+#line 72 "scanner.l"
+{ emit(T_GIVE_TO, -1); return GIVE_TO; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 71 "scanner.l"
-{ emit(T_VIEW, -1); }
+#line 73 "scanner.l"
+{ emit(T_VIEW, -1); return VIEW; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 72 "scanner.l"
-{ emit(T_MIX, -1); }
+#line 74 "scanner.l"
+{ emit(T_MIX, -1); return MIX; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 74 "scanner.l"
-{ emit(T_MINUS, -1); }
+#line 76 "scanner.l"
+{ emit(T_MINUS, -1); return MINUS; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 75 "scanner.l"
-{ emit(T_GREATER, -1); }
+#line 77 "scanner.l"
+{ emit(T_GREATER, -1); return GT; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 76 "scanner.l"
-{ emit(T_LESS, -1); }
+#line 78 "scanner.l"
+{ emit(T_LESS, -1); return LT; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 77 "scanner.l"
-{ emit(T_STAR, -1); }
+#line 79 "scanner.l"
+{ emit(T_STAR, -1); return STAR; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 78 "scanner.l"
-{ emit(T_LBRACKET, -1); }
+#line 80 "scanner.l"
+{ emit(T_LBRACKET, -1); return LBRACKET; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 79 "scanner.l"
-{ emit(T_RBRACKET, -1); }
+#line 81 "scanner.l"
+{ emit(T_RBRACKET, -1); return RBRACKET; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 80 "scanner.l"
-{ emit(T_COMMA, -1); }
+#line 82 "scanner.l"
+{ emit(T_COMMA, -1); return COMMA; }
 	YY_BREAK
 /* Identifiers and constants are recognized by the finite automata.
-       flex only detects the first character; scan_with_fa runs the FA from there. */
+       flex only detects the first character; scan_with_fa runs the FA from there
+       and returns the token for the parser (ID, NUMBER or COLOR). */
 case 18:
 YY_RULE_SETUP
-#line 84 "scanner.l"
-{ scan_with_fa(&identifierFA, T_IDENTIFIER); }
+#line 87 "scanner.l"
+{ return scan_with_fa(&identifierFA, T_IDENTIFIER, ID); }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 85 "scanner.l"
-{ scan_with_fa(&numberFA, T_CONSTANT); }
+#line 88 "scanner.l"
+{ return scan_with_fa(&numberFA, T_CONSTANT, NUMBER); }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 86 "scanner.l"
-{ scan_with_fa(&colorFA, T_CONSTANT); }
+#line 89 "scanner.l"
+{ return scan_with_fa(&colorFA, T_CONSTANT, COLOR); }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 88 "scanner.l"
-{ report("number cannot start with 0 (a canvas size must be 1 or more)"); }
+#line 91 "scanner.l"
+{ report("number cannot start with 0 (a canvas size must be 1 or more)"); return LEXERROR; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 89 "scanner.l"
-{ report("identifier cannot start with a digit"); }
+#line 92 "scanner.l"
+{ report("identifier cannot start with a digit"); return LEXERROR; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 90 "scanner.l"
-{ report("invalid identifier or unknown keyword"); }
+#line 93 "scanner.l"
+{ report("invalid identifier or unknown keyword"); return LEXERROR; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 92 "scanner.l"
+#line 95 "scanner.l"
 { /* whitespace is ignored */ }
 	YY_BREAK
 case 25:
 /* rule 25 can match eol */
 YY_RULE_SETUP
-#line 93 "scanner.l"
+#line 96 "scanner.l"
 { line++; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 94 "scanner.l"
-{ report("unexpected character"); }
+#line 97 "scanner.l"
+{ report("unexpected character"); return LEXERROR; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 96 "scanner.l"
+#line 99 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 959 "lex.yy.c"
+#line 962 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1961,7 +1964,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 96 "scanner.l"
+#line 99 "scanner.l"
 
 
 /* A character that can be part of a word: if the FA stops in front of one, the word is invalid. */
@@ -1985,11 +1988,12 @@ static const char *describe_error(const char *text, int tooLong) {
     return "invalid identifier or unknown keyword";
 }
 
-/* Runs the automaton on the input, starting with the character flex already read
+/* Returns the token for the parser, or LEXERROR if the word is invalid.
+   Runs the automaton on the input, starting with the character flex already read
    (yytext[0]). It follows the transitions as long as there are any (input() reads the
    next character, unput() gives one back). The word is valid if the FA stops in a final
    state and the next character cannot continue the word. */
-static void scan_with_fa(const FA *fa, int tokenCode) {
+static int scan_with_fa(const FA *fa, int pifCode, int parserToken) {
     char text[MAX_TOKEN + 1];
     int len = 0, tooLong = 0;
     int state = fa->start;
@@ -2014,8 +2018,8 @@ static void scan_with_fa(const FA *fa, int tokenCode) {
     if (fa_is_final(fa, state) && !tooLong && !(pending != EOF && is_word_char(pending))) {
         text[len] = '\0';
         if (pending != EOF) unput(pending);
-        emit_text(tokenCode, st_insert(&st, text), text);
-        return;
+        emit_text(pifCode, st_insert(&st, text), text);
+        return parserToken;
     }
 
     /* Invalid word: read the rest of it, so that it is reported only once. */
@@ -2027,16 +2031,19 @@ static void scan_with_fa(const FA *fa, int tokenCode) {
     if (c != EOF && c != 0) unput(c);
     text[len] = '\0';
     report_text(describe_error(text, tooLong), text);
+    return LEXERROR;
 }
 
 int main(int argc, char *argv[]) {
     const char *source = (argc > 1) ? argv[1] : "ProgramExemple_works.txt";
-    char pifName[300], stName[300], errName[300];
+    char pifName[300], stName[300], errName[300], prodName[300];
     FILE *stFile;
+    int result;
 
     snprintf(pifName, sizeof(pifName), "%s.pif.txt", source);
     snprintf(stName, sizeof(stName), "%s.st.txt", source);
     snprintf(errName, sizeof(errName), "%s.err.txt", source);
+    snprintf(prodName, sizeof(prodName), "%s.prod.txt", source);
 
     /* load the three automata (files from Lab 4) */
     if (!fa_load(&identifierFA, IDENTIFIER_FA_FILE) ||
@@ -2053,29 +2060,30 @@ int main(int argc, char *argv[]) {
     pifFile = fopen(pifName, "w");
     stFile = fopen(stName, "w");
     errFile = fopen(errName, "w");
-    if (pifFile == NULL || stFile == NULL || errFile == NULL) {
+    prodFile = fopen(prodName, "w");
+    if (pifFile == NULL || stFile == NULL || errFile == NULL || prodFile == NULL) {
         printf("Cannot create the output files\n");
         return 1;
     }
 
     st_init(&st);
     fprintf(pifFile, "(code, ST position)\ttoken\n");
-    yylex();
+    result = yyparse();          /* the parser asks the scanner (yylex) for tokens */
 
     st_print(&st, stFile);
 
-    if (errorCount == 0) {
-        printf("%s is lexically correct.\n", source);
-        fprintf(errFile, "No lexical errors.\n");
+    if (result == 0) {
+        printf("%s was parsed successfully.\n", source);
+        fprintf(errFile, "No lexical or syntax errors.\n");
     } else {
-        printf("%d lexical error(s) found in %s.\n", errorCount, source);
-        fprintf(errFile, "%d lexical error(s) found.\n", errorCount);
+        printf("Parsing of %s stopped at the first error.\n", source);
     }
 
     fclose(yyin);
     fclose(pifFile);
     fclose(stFile);
     fclose(errFile);
+    fclose(prodFile);
     st_free(&st);
     return 0;
 }
